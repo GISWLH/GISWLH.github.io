@@ -118,16 +118,17 @@ function init() {
         vec2 gw = fwidth(g);
         vec2 gl = abs(fract(g-0.5)-0.5)/gw;
         float grid = 1.0 - min(min(gl.x, gl.y), 1.0);
-        vec3 land = vec3(0.045,0.07,0.115) + grid*vec3(0.06,0.14,0.2);
+        vec3 land = vec3(0.86,0.90,0.94) - grid*vec3(0.10,0.08,0.05);
         float coast = 1.0 - abs(water-0.5)*2.0;
-        vec3 col = mix(land, ocean, water) + coast*vec3(0.35,0.9,1.0)*0.55;
+        vec3 col = mix(land, ocean, water);
+        col = mix(col, vec3(0.03,0.22,0.33), coast*0.85);
         vec3 N = normalize(vN);
         float diff = max(dot(N, uLight), 0.0);
-        col *= 0.34 + 0.78*diff;
+        col *= 0.62 + 0.45*diff;
         float spec = pow(max(dot(reflect(-uLight, N), normalize(vV)), 0.0), 40.0) * water;
         col += spec*vec3(0.6,0.8,1.0)*0.35;
         float fres = pow(1.0 - max(dot(N, normalize(vV)), 0.0), 3.0);
-        col += fres*vec3(0.25,0.7,1.0)*0.55;
+        col = mix(col, vec3(0.86,0.94,1.0), fres*0.75);
         gl_FragColor = vec4(col, 1.0);
       }`
   });
@@ -138,9 +139,9 @@ function init() {
   const atmo = new THREE.Mesh(
     new THREE.SphereGeometry(R * 1.17, 96, 64),
     new THREE.ShaderMaterial({
-      side: THREE.BackSide, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false,
+      side: THREE.BackSide, transparent: true, depthWrite: false,
       vertexShader: `varying vec3 vN; varying vec3 vV; void main(){ vN = normalize(normalMatrix*normal); vec4 mv = modelViewMatrix*vec4(position,1.0); vV = normalize(-mv.xyz); gl_Position = projectionMatrix*mv; }`,
-      fragmentShader: `varying vec3 vN; varying vec3 vV; void main(){ float i = pow(max(0.56 - dot(vN, vV), 0.0), 4.0); gl_FragColor = vec4(0.25,0.72,1.0,1.0)*i*0.85; }`
+      fragmentShader: `varying vec3 vN; varying vec3 vV; void main(){ float i = pow(max(0.56 - dot(vN, vV), 0.0), 4.0); gl_FragColor = vec4(0.40,0.70,0.98, clamp(i*0.55, 0.0, 0.85)); }`
     })
   );
   tiltGroup.add(atmo);
@@ -185,7 +186,7 @@ function init() {
       void main(){
         float d = length(gl_PointCoord - 0.5);
         float a = smoothstep(0.5, 0.0, d) * vA;
-        vec3 c = mix(vec3(1.0,0.95,0.85), vec3(0.75,0.95,1.0), smoothstep(0.2, 0.9, vLat));
+        vec3 c = mix(vec3(1.0,0.97,0.9), vec3(0.85,0.97,1.0), smoothstep(0.2, 0.9, vLat));
         gl_FragColor = vec4(c, a*0.6);
       }`
   });
@@ -200,13 +201,13 @@ function init() {
   const ringPts = [];
   for (let i = 0; i <= 256; i++) { const a = i / 256 * Math.PI * 2; ringPts.push(new THREE.Vector3(Math.cos(a) * ORB, 0, Math.sin(a) * ORB)); }
   orbit.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(ringPts),
-    new THREE.LineBasicMaterial({ color: 0x7dd3fc, transparent: true, opacity: 0.16 })));
+    new THREE.LineBasicMaterial({ color: 0x0369a1, transparent: true, opacity: 0.22 })));
   const satGeo = new THREE.BufferGeometry();
   satGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(6), 3));
   const satMat = new THREE.ShaderMaterial({
-    uniforms: { uPR: { value: renderer.getPixelRatio() } }, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+    uniforms: { uPR: { value: renderer.getPixelRatio() } }, transparent: true, depthWrite: false,
     vertexShader: `uniform float uPR; void main(){ vec4 mv = modelViewMatrix*vec4(position,1.0); gl_PointSize = uPR*9.0*(6.0/-mv.z); gl_Position = projectionMatrix*mv; }`,
-    fragmentShader: `void main(){ float d = length(gl_PointCoord-0.5); float a = smoothstep(0.5,0.0,d); gl_FragColor = vec4(vec3(1.0,0.86,0.6)*1.2, a*a); }`
+    fragmentShader: `void main(){ float d = length(gl_PointCoord-0.5); float a = smoothstep(0.5,0.0,d); gl_FragColor = vec4(mix(vec3(0.76,0.25,0.05), vec3(1.0,0.75,0.4), a), a); }`
   });
   const sats = new THREE.Points(satGeo, satMat);
   orbit.add(sats);
@@ -219,7 +220,7 @@ function init() {
     sp[i * 3] = r * Math.sin(ph) * Math.cos(t); sp[i * 3 + 1] = r * Math.sin(ph) * Math.sin(t); sp[i * 3 + 2] = r * Math.cos(ph) - 10;
   }
   const starGeo = new THREE.BufferGeometry(); starGeo.setAttribute('position', new THREE.BufferAttribute(sp, 3));
-  const stars = new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0x9fb8d9, size: 0.045, transparent: true, opacity: 0.55, depthWrite: false }));
+  const stars = new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0x6b86ab, size: 0.04, transparent: true, opacity: 0.28, depthWrite: false }));
   scene.add(stars);
 
   // --- Layout
