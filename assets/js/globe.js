@@ -1,4 +1,4 @@
-/* Interactive 3D hero globe: illustrative SST-style field + ocean particle flow + GRACE-like twin satellites.
+/* Interactive 3D hero globe: calm light-theme Earth + drifting cloud wisps + water-vapour particle flow + GRACE-like twin satellites.
    Three.js from CDN (jsDelivr, unpkg fallback). Honors prefers-reduced-motion and pauses when off-screen. */
 const SOURCES = [
   'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js',
@@ -77,7 +77,7 @@ function init() {
     float fbm(vec3 p){ float f=0.0; float a=0.5; for(int i=0;i<4;i++){ f+=a*snoise(p); p*=2.03; a*=0.5; } return f; }
   `;
 
-  // --- Earth / SST sphere
+  // --- Earth sphere (calm ocean, natural land, faint graticule)
   const earthMat = new THREE.ShaderMaterial({
     uniforms,
     extensions: { derivatives: true },
@@ -94,46 +94,66 @@ function init() {
       uniform sampler2D uMask; uniform float uTime; uniform vec3 uLight;
       varying vec2 vUv; varying vec3 vN; varying vec3 vV; varying vec3 vP;
       ${noise}
-      vec3 sst(float t){
-        vec3 c0=vec3(0.04,0.11,0.32), c1=vec3(0.11,0.31,0.85), c2=vec3(0.05,0.65,0.91), c3=vec3(0.18,0.83,0.75),
-             c4=vec3(0.64,0.90,0.21), c5=vec3(0.98,0.80,0.08), c6=vec3(0.98,0.45,0.09), c7=vec3(0.86,0.15,0.15);
-        t = clamp(t,0.0,1.0)*7.0;
-        if(t<1.0) return mix(c0,c1,t); if(t<2.0) return mix(c1,c2,t-1.0); if(t<3.0) return mix(c2,c3,t-2.0);
-        if(t<4.0) return mix(c3,c4,t-3.0); if(t<5.0) return mix(c4,c5,t-4.0); if(t<6.0) return mix(c5,c6,t-5.0);
-        return mix(c6,c7,t-6.0);
-      }
       void main(){
-        float water = smoothstep(0.35, 0.65, texture2D(uMask, vUv).r);
+        float r = texture2D(uMask, vUv).r;
+        float water = smoothstep(0.35, 0.65, r);
+        float shelf = 1.0 - texture2D(uMask, vUv, 4.0).r;          // blurred mask -> coastal shallows
         float lat = (vUv.y - 0.5) * 3.14159265;
+        float alat = abs(lat) / 1.5708;
         vec3 p = normalize(vP);
-        float n  = fbm(p*2.1 + vec3(0.0, uTime*0.025, uTime*0.02));
-        float n2 = snoise(p*7.0 + vec3(uTime*0.04, 0.0, 0.0));
-        float T = pow(cos(lat), 2.6)*0.97 + n*0.22 + n2*0.04 - 0.09;
-        vec3 ocean = sst(T);
-        float f = fract(clamp(T,0.0,1.0)*12.0);
-        float iso = 1.0 - smoothstep(0.0, 0.07, min(f, 1.0-f));
-        ocean += iso*0.10;
-        // land: deep glass with graticule and glowing coastline
-        vec2 g = vec2(vUv.x*24.0, vUv.y*12.0);
-        vec2 gw = fwidth(g);
-        vec2 gl = abs(fract(g-0.5)-0.5)/gw;
-        float grid = 1.0 - min(min(gl.x, gl.y), 1.0);
-        vec3 land = vec3(0.86,0.90,0.94) - grid*vec3(0.10,0.08,0.05);
-        float coast = 1.0 - abs(water-0.5)*2.0;
+        float n = fbm(p*3.0);                                        // static texture, not a data field
+        // ocean: calm blues, slightly deeper toward the poles, lighter over shelves
+        vec3 ocean = mix(vec3(0.27,0.56,0.80), vec3(0.15,0.36,0.60), smoothstep(0.1, 0.9, alat));
+        ocean += n*0.025;
+        ocean = mix(ocean, vec3(0.50,0.76,0.88), clamp(shelf*1.6, 0.0, 1.0)*0.55);
+        // land: muted sage / sand / snow
+        float latd = alat*90.0;
+        float dry = exp(-pow((latd-24.0)/11.0, 2.0))*0.75 + n*0.35;
+        vec3 land = mix(vec3(0.62,0.71,0.57), vec3(0.86,0.80,0.66), clamp(dry, 0.0, 1.0));
+        land = mix(land, vec3(0.95,0.96,0.97), smoothstep(62.0, 72.0, latd));
+        land *= 0.96 + n*0.06;
         vec3 col = mix(land, ocean, water);
-        col = mix(col, vec3(0.03,0.22,0.33), coast*0.85);
+        // crisp coastline
+        float coast = smoothstep(0.55, 0.95, 1.0 - abs(r-0.5)*2.0);
+        col = mix(col, vec3(0.22,0.38,0.40), coast*0.7);
+        // faint graticule
+        vec2 g = vec2(vUv.x*24.0, vUv.y*12.0);
+        vec2 gl = abs(fract(g-0.5)-0.5)/fwidth(g);
+        float grid = 1.0 - min(min(gl.x, gl.y), 1.0);
+        col = mix(col, vec3(1.0), grid*0.14);
         vec3 N = normalize(vN);
         float diff = max(dot(N, uLight), 0.0);
-        col *= 0.62 + 0.45*diff;
-        float spec = pow(max(dot(reflect(-uLight, N), normalize(vV)), 0.0), 40.0) * water;
-        col += spec*vec3(0.6,0.8,1.0)*0.35;
+        col *= 0.70 + 0.38*diff;
+        float spec = pow(max(dot(reflect(-uLight, N), normalize(vV)), 0.0), 48.0) * water;
+        col += spec*vec3(0.8,0.9,1.0)*0.30;
         float fres = pow(1.0 - max(dot(N, normalize(vV)), 0.0), 3.0);
-        col = mix(col, vec3(0.86,0.94,1.0), fres*0.75);
+        col = mix(col, vec3(0.84,0.92,1.0), fres*0.7);
         gl_FragColor = vec4(col, 1.0);
       }`
   });
   const earth = new THREE.Mesh(new THREE.SphereGeometry(R, 160, 120), earthMat);
   spin.add(earth);
+
+  // --- Gentle cloud wisps (slowly drifting shell)
+  const cloudMat = new THREE.ShaderMaterial({
+    uniforms, transparent: true, depthWrite: false,
+    vertexShader: `varying vec3 vP; varying vec3 vN; void main(){ vP = position; vN = normalize(mat3(modelMatrix)*normal); gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.0); }`,
+    fragmentShader: /* glsl */`
+      uniform float uTime; uniform vec3 uLight; varying vec3 vP; varying vec3 vN;
+      ${noise}
+      void main(){
+        vec3 p = normalize(vP);
+        float lat = asin(p.y);
+        vec3 q = p*vec3(2.2, 5.0, 2.2) + vec3(uTime*0.012, 0.0, -uTime*0.008);   // zonally stretched wisps
+        float n = fbm(q);
+        float band = 0.55 + 0.45*cos(lat*4.0);                                  // a little more cloud in ITCZ / storm tracks
+        float a = smoothstep(0.10, 0.58, n*band) * 0.6;
+        float diff = max(dot(normalize(vN), uLight), 0.0);
+        gl_FragColor = vec4(vec3(1.0), a*(0.55 + 0.45*diff));
+      }`
+  });
+  const clouds = new THREE.Mesh(new THREE.SphereGeometry(R * 1.018, 128, 96), cloudMat);
+  spin.add(clouds);
 
   // --- Atmosphere glow
   const atmo = new THREE.Mesh(
@@ -146,7 +166,7 @@ function init() {
   );
   tiltGroup.add(atmo);
 
-  // --- Ocean particle flow (zonal currents: easterly trades, mid-latitude westerlies)
+  // --- Water-vapour / moisture flow (zonal: easterly trades, mid-latitude westerlies)
   const COUNT = isMobile() ? 3500 : 9000;
   const seeds = new Float32Array(COUNT * 3);
   for (let i = 0; i < COUNT; i++) {
@@ -161,7 +181,7 @@ function init() {
   pGeo.boundingSphere = new THREE.Sphere(new THREE.Vector3(), R * 1.1);
   const pMat = new THREE.ShaderMaterial({
     uniforms: Object.assign({ uPR: { value: renderer.getPixelRatio() } }, uniforms),
-    transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+    transparent: true, depthWrite: false,
     vertexShader: /* glsl */`
       uniform float uTime; uniform float uPR; uniform sampler2D uMask;
       attribute vec3 seed; varying float vA; varying float vLat;
@@ -171,10 +191,10 @@ function init() {
         float wind = -cos(lat*3.0);
         float u = fract(seed.x + wind*uTime*0.006 + 0.002*sin(uTime*0.5 + seed.z*40.0));
         float v = clamp(seed.y + 0.006*sin(uTime*0.35 + seed.z*6.283 + seed.x*25.0), 0.0, 1.0);
-        float water = smoothstep(0.55, 0.9, texture2D(uMask, vec2(u, v)).r);
+        float water = 0.45 + 0.55*smoothstep(0.55, 0.9, texture2D(uMask, vec2(u, v)).r);
         float life = fract(uTime*0.07 + seed.z);
         float phi = u*2.0*PI; float th = (1.0 - v)*PI;
-        vec3 pos = ${(R * 1.006).toFixed(4)} * vec3(-cos(phi)*sin(th), cos(th), sin(phi)*sin(th));
+        vec3 pos = ${(R * 1.03).toFixed(4)} * vec3(-cos(phi)*sin(th), cos(th), sin(phi)*sin(th));
         vec4 mv = modelViewMatrix * vec4(pos, 1.0);
         vA = water * sin(life*PI) * (0.35 + 0.65*abs(wind));
         vLat = abs(lat);
@@ -186,8 +206,8 @@ function init() {
       void main(){
         float d = length(gl_PointCoord - 0.5);
         float a = smoothstep(0.5, 0.0, d) * vA;
-        vec3 c = mix(vec3(1.0,0.97,0.9), vec3(0.85,0.97,1.0), smoothstep(0.2, 0.9, vLat));
-        gl_FragColor = vec4(c, a*0.6);
+        vec3 c = mix(vec3(0.90,0.97,1.0), vec3(0.72,0.88,1.0), smoothstep(0.2, 0.9, vLat));
+        gl_FragColor = vec4(c, a*0.8);
       }`
   });
   const particles = new THREE.Points(pGeo, pMat);
@@ -276,6 +296,7 @@ function init() {
     uniforms.uTime.value = t;
     px += (tx - px) * 0.04; py += (ty - py) * 0.04;
     spin.rotation.y += dt * 0.05 + dragV;
+    clouds.rotation.y += dt * 0.01;
     dragV *= 0.92;
     tiltGroup.rotation.x = py * 0.12;
     tiltGroup.rotation.y = px * 0.18;

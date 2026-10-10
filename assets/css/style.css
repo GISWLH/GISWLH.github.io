@@ -5,7 +5,6 @@
   --glass:rgba(255,255,255,.62); --glass-2:rgba(255,255,255,.8);
   --cyan:#0f766e; --sky:#0369a1; --blue:#1d4ed8; --warm:#c2410c; --hot:#be123c; --gold:#a16207;
   --grad:linear-gradient(120deg,#0369a1 0%,#0f766e 45%,#a16207 78%,#c2410c 100%);
-  --sst:linear-gradient(90deg,#0b1d51,#1d4ed8,#0ea5e9,#2dd4bf,#a3e635,#facc15,#f97316,#dc2626);
   --shadow:0 1px 2px rgba(15,40,80,.05),0 8px 24px -12px rgba(15,40,80,.18),0 30px 60px -36px rgba(15,40,80,.28);
   --serif:"Instrument Serif","Noto Serif SC","Songti SC",Georgia,serif;
   --sans:"Inter Variable",Inter,system-ui,-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
@@ -51,7 +50,7 @@ html[data-lang="en"] .opt-en,html[data-lang="zh"] .opt-zh{color:var(--cyan)}
 .globe-wrap{position:absolute;inset:0;z-index:-1}
 #globe{width:100%;height:100%;touch-action:pan-y;cursor:grab}
 #globe:active{cursor:grabbing}
-.globe-fallback{display:none;position:absolute;right:-8vw;top:50%;width:min(70vw,780px);aspect-ratio:1;transform:translateY(-50%);border-radius:50%;background:radial-gradient(circle at 35% 35%,#fde68a 0%,#fb923c 12%,#38bdf8 38%,#2563eb 62%,#1e3a8a 82%);box-shadow:0 0 120px rgba(56,189,248,.35),inset -40px -30px 90px rgba(15,40,80,.35);opacity:.9}
+.globe-fallback{display:none;position:absolute;right:-8vw;top:50%;width:min(70vw,780px);aspect-ratio:1;transform:translateY(-50%);border-radius:50%;background:radial-gradient(circle at 35% 35%,#e0f2fe 0%,#7cc4ea 22%,#3b82c4 55%,#1f4f86 85%);box-shadow:0 0 120px rgba(56,189,248,.35),inset -40px -30px 90px rgba(15,40,80,.35);opacity:.9}
 .no-webgl .globe-fallback{display:block}
 .hero::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(90deg,rgba(245,248,252,.94) 0%,rgba(245,248,252,.6) 38%,transparent 62%),linear-gradient(0deg,var(--bg) 0%,transparent 22%)}
 .hero-inner{width:min(calc(100% - 48px),var(--maxw));margin:0 auto;padding:120px 0 90px;pointer-events:none}
@@ -80,9 +79,6 @@ a:hover>.arr,a:hover .arr{transform:translate(2px,-2px)}
 .social{display:flex;gap:10px;list-style:none;padding:0;margin:0}
 .social a{display:grid;place-items:center;width:42px;height:42px;border-radius:50%;border:1px solid var(--line-2);background:rgba(255,255,255,.75);color:var(--ink-2);transition:all .25s var(--ease);box-shadow:0 2px 8px -4px rgba(15,40,80,.15)}
 .social a:hover{color:#fff;background:var(--cyan);border-color:var(--cyan);transform:translateY(-3px)}
-.hud{position:absolute;right:max(24px,calc((100vw - var(--maxw))/2));bottom:42px;display:flex;flex-direction:column;gap:6px;width:250px;font:500 11px/1 var(--mono);color:var(--muted);letter-spacing:.06em;text-transform:uppercase;pointer-events:none}
-.cbar{height:6px;border-radius:6px;background:var(--sst);box-shadow:0 2px 10px rgba(3,105,161,.25)}
-.hud-ticks{display:flex;justify-content:space-between}
 .scroll-cue{position:absolute;left:50%;bottom:28px;transform:translateX(-50%);width:26px;height:42px;border:1.5px solid var(--line-2);border-radius:20px}
 .scroll-cue span{position:absolute;left:50%;top:8px;width:4px;height:8px;margin-left:-2px;border-radius:2px;background:var(--cyan);animation:cue 1.8s var(--ease) infinite}
 @keyframes cue{0%{opacity:0;transform:translateY(0)}30%{opacity:1}100%{opacity:0;transform:translateY(14px)}}
@@ -283,7 +279,6 @@ a:hover>.arr,a:hover .arr{transform:translate(2px,-2px)}
   .hero{align-items:flex-end}
   .hero::after{background:linear-gradient(0deg,var(--bg) 8%,rgba(245,248,252,.85) 45%,rgba(245,248,252,.1) 75%)}
   .hero-inner{padding:44vh 0 64px;width:calc(100% - 36px)}
-  .hud{display:none}
   .section,.stats,.footer{width:calc(100% - 36px)}
   .section{padding-top:88px}
   .stats{grid-template-columns:1fr 1fr;margin-top:0}
@@ -307,6 +302,6 @@ a:hover>.arr,a:hover .arr{transform:translate(2px,-2px)}
   .js .reveal{opacity:1;transform:none}
   .tilt{transform:none!important}
 }
-@media print{.nav,.globe-wrap,.hud,.scroll-cue,.filters{display:none}body{background:#fff;color:#000}.glass{background:none;box-shadow:none;backdrop-filter:none}}
+@media print{.nav,.globe-wrap,.scroll-cue,.filters{display:none}body{background:#fff;color:#000}.glass{background:none;box-shadow:none;backdrop-filter:none}}
 #globe{opacity:0;transition:opacity 1.6s var(--ease)}
 #globe.ready{opacity:1}
