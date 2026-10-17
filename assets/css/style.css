@@ -152,6 +152,20 @@ a:hover>.arr,a:hover .arr{transform:translate(2px,-2px)}
 .pub-year{font:400 28px/1 var(--serif);color:var(--muted);padding-top:2px}
 .pub.first .pub-year{color:var(--cyan)}
 .pub-venue{margin:0 0 4px;font:500 12px/1.4 var(--mono);letter-spacing:.05em;text-transform:uppercase;color:var(--warm)}
+.pub-body{min-width:0}
+.pub-metrics-note{margin:-6px 0 18px;color:var(--muted);font-size:12px;line-height:1.7}
+.pub-venue-line{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;margin:0 0 8px}
+.pub-venue-line .pub-venue{margin:0}
+.journal-metrics{display:inline-flex;flex-wrap:wrap;align-items:center;gap:5px}
+.journal-metric{display:inline-flex;align-items:center;gap:3px;min-height:24px;padding:2px 7px;border:1px solid var(--line-2);border-radius:6px;background:rgba(255,255,255,.65);color:var(--muted);font:500 10.5px/1.5 var(--mono);white-space:nowrap;transition:color .2s,border-color .2s,background .2s}
+.metric-jcr{color:var(--sky);border-color:rgba(3,105,161,.2)}
+.metric-cas{color:var(--cyan);border-color:rgba(15,118,110,.2)}
+.metric-if{color:var(--gold);border-color:rgba(161,98,7,.2)}
+a.journal-metric:hover{background:#fff;border-color:currentColor;text-decoration:underline;text-underline-offset:3px}
+.metric-na{background:transparent}
+.pub-code{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:32px;padding:4px 10px;border:1px solid var(--line-2);border-radius:8px;background:rgba(255,255,255,.7);color:var(--ink-2);font-size:12px;font-weight:600;white-space:nowrap;transition:color .2s,border-color .2s,background .2s}
+.pub-code:hover{background:var(--ink);border-color:var(--ink);color:#fff}
+.pub-code .ic{width:15px;height:15px}
 .pub-title{margin:0 0 6px;font-size:17.5px;line-height:1.4;font-weight:600;letter-spacing:-.005em}
 .pub-title a{background:linear-gradient(var(--cyan),var(--cyan)) 0 100%/0 1px no-repeat;transition:background-size .35s var(--ease),color .2s}
 .pub-title a:hover{background-size:100% 1px;color:var(--sky)}
