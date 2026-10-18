@@ -11,7 +11,7 @@
 - 水文与气候研究方向，包括次季节至季节预测、GRACE、蒸散发及物理约束模型。
 - 代表论文、论文列表及相关外部链接。
 - 开源项目卡片、个人履历与联系方式。
-- 首页地球图形及交互。
+- 杂志封面式首页、多平台链接，以及可悬停读数的海温距平示意图。
 
 ## 文件组织
 
@@ -19,9 +19,8 @@
 | --- | --- |
 | [index.html](index.html) | 页面结构、中英文文案和学术内容 |
 | [assets/css/style.css](assets/css/style.css) | 页面布局、配色与响应式样式 |
-| [assets/js/main.js](assets/js/main.js) | 页面交互逻辑 |
-| [assets/js/globe.js](assets/js/globe.js) | 地球图形相关逻辑 |
-| [assets/img](assets/img) | 图标、分享图和地理底图资源 |
+| [assets/js/main.js](assets/js/main.js) | 页面交互逻辑与海温示意图绘制 |
+| [assets/img](assets/img) | 头像、图标、分享图和海陆掩膜 |
 | [robots.txt](robots.txt)、[sitemap.xml](sitemap.xml) | 搜索引擎抓取入口 |
 
 ## 本地预览与维护
