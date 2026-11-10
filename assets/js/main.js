@@ -36,6 +36,24 @@
     });
   });
 
+  // Award photos: open the full-size image in a modal dialog (links still work without JS)
+  var lb = document.getElementById('lightbox');
+  if (lb && typeof lb.showModal === 'function') {
+    var lbImg = lb.querySelector('img'), lbCap = lb.querySelector('p');
+    document.querySelectorAll('.award-gallery a').forEach(function (a) {
+      a.addEventListener('click', function (e) {
+        e.preventDefault();
+        var cap = a.parentNode.querySelector('figcaption');
+        lbImg.src = a.getAttribute('href');
+        lbImg.alt = a.querySelector('img').alt;
+        lbCap.innerHTML = cap ? cap.innerHTML : '';
+        lb.showModal();
+      });
+    });
+    lb.addEventListener('click', function (e) { if (e.target !== lbImg) lb.close(); });
+    lb.addEventListener('close', function () { lbImg.removeAttribute('src'); });
+  }
+
   // Publication filters
   var fbtns = document.querySelectorAll('.filters button');
   var count = document.getElementById('pub-count');
