@@ -1,4 +1,4 @@
-![GISWLH：水文与气候人工智能](assets/readme/banner.svg)
+![GISWLH：水文与气候人工智能](assets/readme/banner.png)
 
 # GISWLH.github.io
 
@@ -33,9 +33,6 @@ python -m http.server 8000
 ```
 
 在浏览器打开 `http://localhost:8000`。修改学术内容时同时检查中英文文案；更新链接后检查导航、论文链接、项目卡片和移动端布局。站点根目录保留 `.nojekyll`，用于直接提供静态资源。
-
-首页横幅的可编辑源文件：[banner.excalidraw](assets/readme/banner.excalidraw)。
-
 
 <!-- readme-visual-refresh:additional-result -->
 ## Project output preview
